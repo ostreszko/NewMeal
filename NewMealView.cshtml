@@ -1,0 +1,242 @@
+﻿@model Callorie.Models.NewMealModel
+
+@{
+    ViewData["Title"] = "Nowy Posiłek";
+    Layout = "_LoggedLayout";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://momentjs.com/downloads/moment-with-locales.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Callorie</title>
+</head>
+<body>
+    <div class="col-md-12 p-0  align-items-center">
+        <div class="col-md-12 p-0 h-md-100 align-items-center position-static">
+            <ul class="nav nav-tabs " id="myTab" role="tablist">
+                <li style="color: black" class="nav-item">
+                    <a style="color: black" class="nav-link active" id="addMeal-tab" data-toggle="tab" href="#addMeal" role="tab" aria-controls="addMeal" aria-selected="true">Dodaj Posiłek</a>
+                </li>
+                <li style="color: black" class="nav-item">
+                    <a style="color: black" class="nav-link" id="editMeal-tab" data-toggle="tab" href="#editMeal" role="tab" aria-controls="editMeal" aria-selected="false">Edytuj/Usuń</a>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-content col-md-12 p-0 bg-indigo h-md-50" id="myTabContent">
+            <div class="tab-pane fade show active" id="addMeal" role="tabpanel" aria-labelledby="addMeal-tab">
+                <div class="col-md-12 p-0 bg-indigo ">
+                    <h1>Dodaj nowy posiłek</h1>
+                    <span id="communicate" class="text-danger"></span>
+                    <form method="post">
+
+                        @if (Model.AddedDish != null)
+                        {
+                            <a>Posiłek o nazwie @Model.AddedDish został dodany</a><br />
+                        }
+
+                        <div class="form-group col-md-12">
+                            <label asp-for="DishId">Danie</label>
+                            <select asp-for="DishId" id="DishListAdd" class="form-control" asp-items="Model.OnlyMineDDLDishList">
+                            </select>
+                            <span>Tylko moje dania </span><input id="onlyMyDishesAdd" type="checkbox" checked="">
+                            <span id="DishIdSpan" asp-validation-for="DishId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <label asp-for="Amount">Ilość (g)</label>
+                            <input value="" placeholder="np. 100" asp-for="Amount" class="form-control" />
+                            <span id="AmountSpan" asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <label asp-for="Name">Nazwa</label>
+                            <input maxlength="200" value="" placeholder="Nazwa Posiłku" asp-for="Name" class="form-control" />
+                            <span id="NameSpan" asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <label asp-for="Description">Opis</label>
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @rows = 4, @placeholder = "Opis posiłku", @id = "FormDescription", @maxlength = 3000 })
+                            <span id="DescriptionSpan" asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+
+                        <div class="form-group col-md-12">
+                            <label asp-for="Date" class=" col-md-12 ">Data</label>
+                            <input value="" type="date" id="Date" asp-for="Date" class="form-control col-md-3 float-left" />
+                            <input value="" type="time" asp-for="Time" class="form-control col-md-2 float-left" />
+                            <span id="DateSpan" asp-validation-for="Date" class="text-danger"></span>
+                        </div>
+
+                        <div class=" col-md-12" style="clear:both ;padding-top:15px">
+                            <button type="submit" id="AddMeal" value="add" name="submitButton" class="btn btn-primary">Dodaj posiłek</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="editMeal" role="tabpanel" aria-labelledby="editMeal-tab">
+                <h1>Edytuj/Usuń Posiłek</h1>
+                <div class="col-md-12 p-0 h-md-100">
+                    <form method="post">
+                        <div class="form-group col-md-12">
+                            <label asp-for="EditMealId">Posiłek</label>
+                            <select asp-for="EditMealId" id="EditMealId" class="form-control" asp-items="Model.MealList">
+                            </select>
+                            <span id="EditMealIdSpan" asp-validation-for="EditMealId" class="text-danger"></span>
+                            <div class="form-group">
+                                <label asp-for="EditedToDishId">Danie</label>
+                                <select asp-for="EditedToDishId" class="form-control" id="EditedToDishId" asp-items="Model.OnlyMineDDLDishList">
+                                </select>
+                                <span>Tylko moje dania </span><input id="onlyMyDishesEdit" type="checkbox" checked="">
+                                <span id="EditedToDishIdSpan" asp-validation-for="EditedToDishId" class="text-danger"></span>
+                            </div>
+
+                            <label asp-for="EditedToAmount">Ilość (g)</label>
+                            <input value="" id="EditedToAmount" placeholder="np. 100" asp-for="EditedToAmount" class="form-control" />
+                            <span id="EditedToAmountSpan" asp-validation-for="EditedToAmount" class="text-danger"></span>
+
+                            <label asp-for="EditedToName">Nazwa</label>
+                            <input maxlength="200" value="" id="EditedToName" placeholder="Nazwa Posiłku" asp-for="EditedToName" class="form-control" />
+                            <span id="EditedToNameSpan" asp-validation-for="EditedToName" class="text-danger"></span>
+
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="EditedToDescription">Opis</label>
+                            @Html.TextAreaFor(model => model.EditedToDescription, new { @class = "form-control", @rows = 4, @placeholder = "Opis posiłku", @id = "EditedToDescription", @maxlength = 3000 })
+                            <span id="EditedToDescriptionSpan" asp-validation-for="EditedToDescription" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="EditedToDate" class=" col-md-12 ">Data</label>
+                            <input value="" type="date" id="EditedToDate" asp-for="EditedToDate" class="form-control col-md-3 float-left" />
+                            <input value="" type="time" id="EditedToTime" asp-for="EditedToTime" class="form-control col-md-2 float-left" />
+                            <span id="EditedToDateSpan" asp-validation-for="EditedToDate" class="text-danger"></span>
+                        </div>
+                        <div class=" col-md-12" style="clear:both ;padding-top:15px">
+                            <button type="submit" id="EditMeal" name="submitButton" value="edit" class="btn btn-primary">Edytuj posiłek</button>
+                            <button type="submit" id="DeleteMeal" name="submitButton" value="delete" class="btn btn-primary">Usuń posiłek</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+	
+        //Cały JavaScript to głównie uzupełnianie kontrolek danymi z modelu
+		
+        $(document).ready(function () {
+            FillMealsFieldsWithValues();
+            moment.locale("pl");
+            $('#Date').val(moment().format('YYYY-MM-DD'));
+            $('#Time').val(moment().format('LT'));
+            $('#EditedToDate').val(moment().format('YYYY-MM-DD'));
+            $('#EditedToTime').val(moment().format('LT'));
+
+            $("a[href='#addMeal']").on('show.bs.tab', function(e) {
+                $("#DishIdSpan").hide();
+                $("#AmountSpan").hide();
+                $("#NameSpan").hide();
+                $("#DescriptionSpan").hide();
+                $("#DateSpan").hide();
+            });
+            $("a[href='#editMeal']").on('show.bs.tab', function(e) {
+                $("#EditMealIdSpan").hide();
+                $("#EditedToDishIdSpan").hide();
+                $("#EditedToAmountSpan").hide();
+                $("#EditedToNameSpan").hide();
+                $("#EditedToDescriptionSpan").hide();
+                $("#EditedToDateSpan").hide();
+            });
+
+            var communicate = JSON.parse('@Html.Raw(Json.Serialize(Model.Communicate))');
+            $("#communicate").hide();
+
+            if (communicate == "Added") {
+                $("#communicate").show();
+                $("#communicate").text("Dodano posiłek");
+                $("#communicate").addClass('text-success').removeClass('text-danger');
+            }
+
+        });
+        $("#EditMealId").change(FillMealsFieldsWithValues);
+
+        function FillMealsFieldsWithValues() {
+            var allMealsArray = JSON.parse('@Html.Raw(Json.Serialize(Model.AllMeals))');
+            if (allMealsArray.length > 0) {
+                var selectedMealId = $("#EditMealId").val();
+                var mealData;
+                var i;
+                for (i = 0; i < allMealsArray.length; i++) {
+                    if (allMealsArray[i].id == selectedMealId) {
+                        mealData = allMealsArray[i];
+                        break;
+                    }
+                }
+                $("#EditedToDishId").val(mealData.dish_Id);
+                $("#EditedToName").val(mealData.meal_Name);
+                $("#EditedToDescription").val(mealData.description);
+                $("#EditedToAmount").val(mealData.amount);
+                $('#EditedToDate').val(moment(mealData.meal_Date).format('YYYY-MM-DD'));
+                $('#EditedToTime').val(moment(mealData.meal_Date).format('HH:MM'));
+            } else {
+                $("#EditMeal").prop('disabled', true);
+                $("#DeleteMeal").prop('disabled', true);
+            }
+            selectDishListArray = JSON.parse('@Html.Raw(Json.Serialize(Model.OnlyMineDDLDishList))');
+            if (selectDishListArray.length > 0) {
+            } else {
+                $("#AddMeal").prop('disabled', true);
+            }
+        }
+
+        $("#onlyMyDishesAdd").change(function () {
+            var selectDishListArray = [];
+            var arrOptions = [];
+            $("#DishListAdd").empty();
+            if ($("#onlyMyDishesAdd")[0].checked == true) {
+                selectDishListArray = JSON.parse('@Html.Raw(Json.Serialize(Model.OnlyMineDDLDishList))');
+            } else {
+                selectDishListArray = JSON.parse('@Html.Raw(Json.Serialize(Model.DDLDishList))');
+            }
+            if (selectDishListArray.length > 0) {
+                var i;
+                for (i = 0; i < selectDishListArray.length; i++) {
+                    arrOptions.push("<option value='" + selectDishListArray[i].value + "'>" + selectDishListArray[i].text + "</option>");
+                }
+                document.getElementById("DishListAdd").innerHTML = arrOptions.join();
+                $("#AddMeal").prop('disabled', false);
+            } else {
+                $("#AddMeal").prop('disabled', true);
+            }
+        });
+
+            $("#onlyMyDishesEdit").change(function () {
+            var selectDishListArray = [];
+            var arrOptions = [];
+            $("#EditedToDishId").empty();
+                if ($("#onlyMyDishesEdit")[0].checked == true) {
+                    selectDishListArray = JSON.parse('@Html.Raw(Json.Serialize(Model.OnlyMineDDLDishList))');
+                } else {
+                    selectDishListArray = JSON.parse('@Html.Raw(Json.Serialize(Model.DDLDishList))');
+                }
+                var i;
+                for (i = 0; i < selectDishListArray.length; i++) {
+                    arrOptions.push("<option value='" + selectDishListArray[i].value + "'>" + selectDishListArray[i].text + "</option>");
+                }
+                document.getElementById("EditedToDishId").innerHTML = arrOptions.join();
+        });
+
+    </script>
+</body>
+</html>
